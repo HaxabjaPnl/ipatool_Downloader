@@ -1,24 +1,48 @@
 import re
 import urllib.request
-import os
+import subprocess
 
-url = "https://itunes.apple.com/lookup?id="
-number = input("input store id: ")
+def get_bundle_id(store_id):
+    """Gets the bundle ID of an iOS app from the App Store.
 
-full_url = url + number
+    Args:
+        store_id (str): The store ID of the app.
 
-response = urllib.request.urlopen(full_url)
-data = response.read().decode('utf-8')
+    Returns:
+        str: The bundle ID of the app.
+    """
 
-result = re.search(r'"bundleId"\s*:\s*"([^"]+)"', data)
-if result:
-    bundle_id = result.group(1)
-    print(f"bundleId: {bundle_id}")
+    url = "https://itunes.apple.com/lookup?id=" + store_id
 
-    auth_login_proc = subprocess.Popen(["ipatool", "auth", "login", "--email=your apple id email address here"])
+    try:
+        response = urllib.request.urlopen(url)
+        data = response.read().decode('utf-8')
+
+        result = re.search(r'"bundleId"\s*:\s*"([^"]+)"', data)
+        if result:
+            return result.group(1)
+        else:
+            return None
+    except urllib.error.URLError as e:
+        print(e)
+        return None
+
+def download_ipa(bundle_id):
+    """Downloads the IPA file for an iOS app.
+
+    Args:
+        bundle_id (str): The bundle ID of the app.
+    """
+
+    auth_login_proc = subprocess.Popen(["ipatool", "auth", "login", "--email=your email address here"])
     auth_login_proc.wait()
 
     download_proc = subprocess.Popen(["ipatool", "download", "-b", bundle_id])
     download_proc.wait()
-else:
-    print("bundleId not found.")
+
+if __name__ == "__main__":
+    store_id = input("input store id: ")
+    bundle_id = get_bundle_id(store_id)
+    print(f"bundleId: {bundle_id}")
+
+    download_ipa(bundle_id)
