@@ -15,7 +15,10 @@ if result:
     bundle_id = result.group(1)
     print(f"bundleId: {bundle_id}")
 
-    os.system("ipatool auth login --email=your apple id email address here")
-    os.system("ipatool download -b " + bundle_id)
+    auth_login_proc = subprocess.Popen(["ipatool", "auth", "login", "--email=your apple id email address here"])
+    auth_login_proc.wait()
+
+    download_proc = subprocess.Popen(["ipatool", "download", "-b", bundle_id])
+    download_proc.wait()
 else:
     print("bundleId not found.")
