@@ -33,8 +33,8 @@ def download_ipa(bundle_id):
     Args:
         bundle_id (str): The bundle ID of the app.
     """
-
-    auth_login_proc = subprocess.Popen(["ipatool", "auth", "login", "--email=your email address here"])
+    email = input("input your Apple ID: ")
+    auth_login_proc = subprocess.Popen(["ipatool", "auth", "login", "--email", email])
     auth_login_proc.wait()
 
     download_proc = subprocess.Popen(["ipatool", "download", "-b", bundle_id])
